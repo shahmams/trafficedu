@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoSense AI - Noise Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg-start: #eaf2f8;
+    --bg-end: #ffffff;
+    --card-bg: #ffffff;
+    --primary-color: #008080;
+    --primary-gradient-end: #00a9a9;
+    --text-dark: #2d3748;
+    --text-light: #718096;
+    --border-color: #e2e8f0;
+    --shadow-light: rgba(45, 55, 72, 0.08);
+    --shadow-dark: rgba(45, 55, 72, 0.12);
+    --low-color: #28a745;
+    --medium-color: #ffc107;
+    --high-color: #dc3545;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-image: linear-gradient(to top, var(--bg-start) 0%, var(--bg-end) 100%);
+    color: var(--text-dark);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.container {
+    background: var(--card-bg);
+    padding: 2.5rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px var(--shadow-light), 0 5px 10px var(--shadow-light);
+    width: 100%;
+    max-width: 550px;
+    text-align: center;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px var(--shadow-dark), 0 8px 15px var(--shadow-light);
+}
+
+.header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header .tagline {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fafbff;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background-color: #f7f9fc;
+    transform: scale(1.02);
+}
+
+#imagePreview {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    display: none;
+}
+
+#previewText {
+    color: var(--text-light);
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.upload-area:hover #previewText {
+    color: var(--primary-color);
+}
+
+#previewText svg {
+    display: block;
+    margin: 0 auto 1rem;
+    width: 48px;
+    height: 48px;
+    stroke: var(--text-light);
+    stroke-width: 1.5;
+    transition: stroke 0.3s ease;
+}
+
+.upload-area:hover #previewText svg {
+    stroke: var(--primary-color);
+}
+
+#imageInput { display: none; }
+
+.results-card {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    text-align: left;
+    display: none;
+    background-color: #fdfdff;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.results-card h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    color: var(--text-dark);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    padding: 0.5rem 0;
+}
+
+.result-item span:first-child {
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+#noiseLevelResult {
+    font-weight: 700;
+    padding: 0.3rem 0.85rem;
+    border-radius: 7px;
+    color: white;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.low { background-color: var(--low-color); }
+.medium { background-color: var(--medium-color); color: var(--text-dark); }
+.high { background-color: var(--high-color); }
+
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    display: none;
+    margin: 1.5rem auto 0;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.footer-tagline {
+    margin-top: 2.5rem;
+    font-style: italic;
+    color: var(--text-light);
+}
+
+button#resetBtn {
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button#resetBtn:hover {
+    background-color: var(--primary-gradient-end);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <h1>EchoSense AI</h1>
+        <p class="tagline">Analyzing traffic density to estimate urban noise pollution.</p>
+    </header>
+
+    <label for="imageInput" class="upload-area" id="uploadArea">
+        <div id="previewText">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Click or drag to upload an image
+        </div>
+        <img id="imagePreview" src="" alt="Image Preview"/>
+    </label>
+    <input type="file" id="imageInput" accept="image/*">
+
+    <div class="loader" id="loader"></div>
+
+    <section class="results-card" id="resultsCard">
+        <h2>Analysis Report</h2>
+        <div class="result-item">
+            <span>Vehicles Detected:</span>
+            <span id="vehicleCountResult"></span>
+        </div>
+        <div class="result-item">
+            <span>Estimated Noise Level:</span>
+            <span id="noiseLevelResult"></span>
+        </div>
+        <button id="resetBtn">Upload Another Image</button>
+    </section>
+
+    <p class="footer-tagline">Promoting quieter streets for a calmer tomorrow.</p>
+</div>
+
+<script>
+const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+const previewText = document.getElementById('previewText');
+const resultsCard = document.getElementById('resultsCard');
+const vehicleCountResult = document.getElementById('vehicleCountResult');
+const noiseLevelResult = document.getElementById('noiseLevelResult');
+const loader = document.getElementById('loader');
+const resetBtn = document.getElementById('resetBtn');
+
+imageInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = 'block';
+            previewText.style.display = 'none';
+        }
+        reader.readAsDataURL(file);
+        uploadAndPredict(file);
+    }
+});
+
+resetBtn.addEventListener('click', () => {
+    imagePreview.src = '';
+    imagePreview.style.display = 'none';
+    previewText.style.display = 'block';
+    resultsCard.style.display = 'none';
+    imageInput.value = ''; // reset file input
+});
+
+async function uploadAndPredict(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    loader.style.display = 'block';
+    resultsCard.style.display = 'none';
+
+    try {
+        const response = await fetch('http://127.0.0.1:5000/predict', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+
+        displayResults(data);
+
+    } catch (error) {
+        console.error('Prediction Error:', error);
+        alert(`Prediction failed: ${error.message}`);
+    } finally {
+        loader.style.display = 'none';
+    }
+}
+
+function displayResults(data) {
+    vehicleCountResult.textContent = data.num_vehicles;
+    noiseLevelResult.textContent = data.noise_level;
+
+    noiseLevelResult.className = '';
+    const noiseLevel = data.noise_level.toLowerCase();
+    noiseLevelResult.classList.add(noiseLevel);
+
+    resultsCard.style.display = 'block';
+}
+</script>
+</body>
+</html>
