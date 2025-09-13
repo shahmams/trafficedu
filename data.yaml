@@ -2,8 +2,9 @@ names:
 - car
 - bus
 - truck
-- motorcycle
-- bicycle
+- bike
+- auto
 nc: 5
-train: /content/yolov8_dataset/images/train
-val: /content/yolov8_dataset/images/val
+train: /content/drive/MyDrive/VehicleNoiseProject/images/dataset/Apply_Grayscale/Apply_Grayscale/Vehicles_Detection.v9i.yolov8/train/images
+val: /content/drive/MyDrive/VehicleNoiseProject/images/dataset/Apply_Grayscale/Apply_Grayscale/Vehicles_Detection.v9i.yolov8/valid/images
+test: /content/drive/MyDrive/VehicleNoiseProject/images/dataset/Apply_Grayscale/Apply_Grayscale/Vehicles_Detection.v9i.yolov8/test/images
