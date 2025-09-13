@@ -3,7 +3,7 @@ services:
     name: vehicle-noise-app
     env: python
     plan: free
-    buildCommand: "pip install -r backend/requirements.txt"
+    buildCommand: "pip install -r requirements.txt"
     startCommand: ./start.sh
     autoDeploy: true
 
