@@ -17,7 +17,7 @@ EchoSense AI is a full-stack application designed to provide a simple yet effect
 This project demonstrates the end-to-end process of building and deploying a machine learning application, from the Python Flask backend to the interactive front end, all hosted on a cloud platform.
 
 # App in Action
-<!-- Add a screenshot or an animated GIF of your application here! -->
+<!-- demo -->![Image](https://github.com/user-attachments/assets/141bc00f-f894-4a86-beda-07555623704f)
 
 <!-- Example: -->
 
