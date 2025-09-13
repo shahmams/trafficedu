@@ -1,0 +1,37 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+env/
+venv/
+.Python
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# Flask uploads (user uploaded images)
+uploads/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+# PyTorch / Ultralytics model weights (if you don't want to push large files)
+*.pt
+*.pth
+
+# Coverage reports
+htmlcov/
+.coverage
